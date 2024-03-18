@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from .models import Game
-from django.http import JsonResponse
 
 def input(request):
     error_message = None  
     
     if request.method == 'POST':
+        # Get the input from the form
         player1_name = request.POST.get('player1')
         player2_name = request.POST.get('player2')
         room_id = request.POST.get('room_id')
@@ -25,19 +25,25 @@ def input(request):
 
 
 def index(request, player1_name, player2_name,room_id):
+    # render index.html with information that contain player names and room-id
     return render(request, 'index.html', {'player1_name': player1_name, 'player2_name': player2_name, 'room_id':room_id})
 
 def update(request):
     if request.method == 'POST':
+        # Get the information of who won and room-id
         winner = request.POST.get('winner')
         room_id = request.POST.get('room_id')
-        print("Winner:"+winner)
+        
         game = Game.objects.get(room_id=room_id)
         if winner == 'player1':
             game.player1wins += 1
+            print("Winner:"+game.player1) #print winner in the terminal
         elif winner == 'player2':
             game.player2wins += 1
-        game.save()
+            print("Winner:"+game.player2) #print winner in the terminal
+        else:
+            print("Game Result: "+winner) #when the match is draw
+        game.save() #save the changes in the database
         player1_name=game.player1
         player2_name=game.player2
         return redirect('index', player1_name=player1_name, player2_name=player2_name, room_id=room_id)
