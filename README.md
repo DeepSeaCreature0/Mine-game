@@ -20,3 +20,16 @@ source venv/Scripts/activate
 ```bash
 python manage.py runserver
 ```
+## UI
+
+### Landing Page
+![Screenshot (2)](https://github.com/DeepSeaCreature0/Mine-game/assets/138828627/1f7f0610-a25c-40d5-90fc-cdba9d6d41c4)
+
+### Game Page
+![Screenshot (3)](https://github.com/DeepSeaCreature0/Mine-game/assets/138828627/fd393777-b106-4e5d-b1ef-03f977ad9977)
+
+### Game Over
+![Screenshot (4)](https://github.com/DeepSeaCreature0/Mine-game/assets/138828627/6d5ed00b-93eb-4707-94b5-8448036de81e)
+
+### Game State after each move
+![Screenshot (5)](https://github.com/DeepSeaCreature0/Mine-game/assets/138828627/c58ac9e6-c0ca-40e4-9d5d-a524fe37fbdf)
