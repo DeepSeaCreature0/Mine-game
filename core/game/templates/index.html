@@ -11,8 +11,6 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
     <title>Play Game</title>
-
-
 </head>
 
 <style>
@@ -275,6 +273,36 @@
         color: #b43;
         font-weight: bolder;
     }
+    
+    /* Hidden form styles */
+    .hidden-form-container {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hidden-form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .hidden-form input[type="submit"] {
+        background-color: #575;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
 </style>
 
 <body class="bg-dark">
@@ -283,8 +311,8 @@
 
         <div class="game flex-column">
             <div class="scoreboard">
-                <div class="player1">Player 1</div>
-                <div class="player2">Player 2</div>
+                <div class="player1">{{player1_name}}</div>
+                <div class="player2">{{player2_name}}</div>
             </div>
             <div class="boardcontainer">
                 <div class="board">
@@ -318,23 +346,32 @@
         </div>
     </div>
 
+    <div class="hidden-form-container" id="hidden-form-container">
+        <div class="hidden-form">
+            <p id="result-message"></p> <!-- New paragraph element for displaying result message -->
+            <form id="winner-form" action="{% url 'update' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="winner" id="winner-input">
+                <input type="hidden" name="room_id" id="room-id-input">
+                <input type="submit" value="Save and Restart">
+            </form>
+        </div>
+    </div>
 
-
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-
-
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-
+    
             const boxes = document.querySelectorAll('.space');
             const element1 = document.querySelector('.player1');
             const element2 = document.querySelector('.player2');
             const mine_idx = Math.floor(Math.random() * 25);
-
+            console.log({{room_id}})
             let count=0;
             let turn1=true;
-            
+            let winner;
+            let room_id={{room_id}}
+    
             boxes.forEach(function(box, index) {
                 box.addEventListener('click', function() {
                     // Check if the box has already been clicked
@@ -343,25 +380,27 @@
                     }
                     if (index === mine_idx) {
                         box.innerHTML = 'B';
+                        if(turn1)console.log("{{player1_name}} clicked on bomb, game over!");
+                        else console.log("{{player2_name}} clicked on bomb, game over!");
                         if(turn1){
-                            swal("Game Over!" , "Player 2 won" , "success").then(() => {
-                                window.location.reload();
-                            });
+                            winner = 'player2';
+                            displayHiddenForm(winner, room_id);
                         }
                         else{
-                            swal("Game Over!" , "Player 1 won" , "success").then(() => {
-                                window.location.reload();
-                            });
+                            winner = 'player1';
+                            displayHiddenForm(winner, room_id);
                         }
                     }
                     else{
                         box.innerHTML = 'G';
                         count++;
+                        if(turn1)console.log("{{player1_name}} clicked on empty box, updated grid state:");
+                        else console.log("{{player2_name}} clicked on empty box, updated grid state:");
                         turn1=!turn1;
+                        
+                        logGridState(boxes); // Log the state of the grid
                         if(count==24){
-                            swal("Draw!" , "Game end no one won" , "warning").then(() => {
-                                window.location.reload();
-                            });
+                            displayHiddenForm('Draw', room_id);
                         }
                         if(!turn1){
                             element1.style.color='#333';
@@ -378,8 +417,45 @@
                     }
                 });
             });
+    
+            // Function to log the state of the grid
+            function logGridState(boxes) {
+                let gridState = '';
+                boxes.forEach((box, index) => {
+                    if (box.innerHTML === 'G') {
+                        gridState += 'G '; // Gem
+                    } else {
+                        gridState += '? '; // Empty box
+                    }
+                    if ((index + 1) % 5 === 0) {
+                        gridState += '\n'; // Add newline after each row
+                    }
+                });
+                console.log(gridState);
+            }
+    
+            function displayHiddenForm(winner, room_id) {
+                const hiddenFormContainer = document.getElementById('hidden-form-container');
+                const winnerInput = document.getElementById('winner-input');
+                const roomIdInput = document.getElementById('room-id-input');
+                const resultMessage = document.getElementById('result-message');
+    
+                winnerInput.value = winner;
+                roomIdInput.value = room_id;
+    
+                // Set the result message based on the winner or if it's a draw
+                if (winner === 'Draw') {
+                    resultMessage.textContent = 'The match ended in a draw.';
+                } else {
+                    resultMessage.textContent = 'The winner is ' + winner + '.';
+                }
+    
+                hiddenFormContainer.style.display = 'flex';
+            }
         });
     </script>
+    
+    
 </body>
 
 </html>
