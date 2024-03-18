@@ -8,3 +8,15 @@ A turn-based game of mines with 2 players. The players compete with each other t
 4. Print the grid state in the console
 5. Let the players start new game without creating a new room when the game finishes
 6. Count the number of wins of both player and store them in the databas
+
+Note:- To run go through setup.md  first
+
+## To Run
+1. Activate virtual environment
+```bash
+source venv/Scripts/activate
+```
+2. Start server
+```bash
+python manage.py runserver
+```
